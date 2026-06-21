@@ -35,6 +35,14 @@ applyTheme(localStorage.getItem(THEME_KEY) || 'bali');
 
 const LABELS = { user: 'You', bot: 'Travel AI 🌍' };
 
+const LOADING_TEXTS = [
+    'Planning your journey...',
+    'Exploring destinations...',
+    'Finding the best routes...',
+    'Checking local tips...',
+    'Consulting travel guides...',
+];
+
 marked.setOptions({ breaks: true });
 
 function renderBubble(bubble, role, text) {
@@ -43,6 +51,34 @@ function renderBubble(bubble, role, text) {
     } else {
         bubble.textContent = text;
     }
+}
+
+function appendLoading() {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'message bot';
+
+    const label = document.createElement('span');
+    label.className = 'msg-label';
+    label.textContent = LABELS['bot'];
+
+    const bubble = document.createElement('div');
+    bubble.className = 'msg-bubble';
+
+    const randomText = LOADING_TEXTS[Math.floor(Math.random() * LOADING_TEXTS.length)];
+    bubble.innerHTML = `
+        <div class="travel-loading">
+            <div class="loading-plane">✈</div>
+            <div class="loading-dots">
+                <span></span><span></span><span></span>
+            </div>
+            <div class="loading-text">${randomText}</div>
+        </div>
+    `;
+
+    wrapper.append(label, bubble);
+    chatBox.appendChild(wrapper);
+    chatBox.scrollTop = chatBox.scrollHeight;
+    return bubble;
 }
 
 function appendMessage(role, text, scroll = true) {
@@ -185,7 +221,7 @@ form.addEventListener('submit', async function (e) {
     conversation.push({ role: 'user', text: userMessage });
     persistCurrent();
 
-    const { bubble } = appendMessage('bot', 'Thinking...');
+    const bubble = appendLoading();
 
     try {
         const res = await fetch('/api/chat', {
