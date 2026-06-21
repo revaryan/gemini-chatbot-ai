@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="bali">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Travel Assistant</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div class="app">
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <span class="brand-icon">🌴</span>
+                <span class="brand-name">TravelAI</span>
+            </div>
+
+            <button id="new-chat-btn" class="new-chat-btn">
+                <span>＋</span> New Trip
+            </button>
+
+            <p class="sidebar-label">Recent Trips</p>
+            <div id="session-list" class="session-list"></div>
+
+            <div class="sidebar-footer">
+                <p class="sidebar-label">Theme</p>
+                <div class="theme-picker">
+                    <button class="theme-dot active" data-theme="bali"      title="Bali"      style="--dot:#00B4A2"></button>
+                    <button class="theme-dot"         data-theme="maldives"  title="Maldives"  style="--dot:#0096C7"></button>
+                    <button class="theme-dot"         data-theme="hawaii"    title="Hawaii"    style="--dot:#FF7F5C"></button>
+                    <button class="theme-dot"         data-theme="santorini" title="Santorini" style="--dot:#4361EE"></button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Chat -->
+        <div class="chat-container">
+            <div class="chat-header">
+                <div class="header-info">
+                    <div class="header-avatar">✈️</div>
+                    <div>
+                        <h2 class="chat-title">AI Travel Assistant</h2>
+                        <p class="chat-subtitle">Online · Speaks every language</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="chat-box">
+                <div class="welcome-msg">
+                    <span class="welcome-icon">🌏</span>
+                    <p>Hello! I'm your AI travel companion.</p>
+                    <p>Ask me anything — destinations, visas, itineraries, local tips, or translate any sign or text from any language!</p>
+                </div>
+            </div>
+
+            <form id="chat-form">
+                <input
+                    type="text"
+                    id="user-input"
+                    placeholder="Where do you want to go? ✈"
+                    autocomplete="off"
+                    required
+                />
+                <button type="submit">Send ➤</button>
+            </form>
+        </div>
+
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
