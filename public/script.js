@@ -30,67 +30,20 @@ document.querySelectorAll('.theme-dot').forEach(btn => {
 applyTheme(localStorage.getItem(THEME_KEY) || 'bali');
 
 /* ═══════════════════════════════
-   LANGUAGE DETECTION
-═══════════════════════════════ */
-
-function detectLang(text) {
-    if (/[぀-ゟ゠-ヿ]/.test(text))  return 'ja-JP';
-    if (/[가-힯]/.test(text))        return 'ko-KR';
-    if (/[一-鿿]/.test(text))        return 'zh-CN';
-    if (/[؀-ۿ]/.test(text))        return 'ar-SA';
-    if (/[฀-๿]/.test(text))        return 'th-TH';
-    if (/[Ѐ-ӿ]/.test(text))        return 'ru-RU';
-    if (/[ऀ-ॿ]/.test(text))        return 'hi-IN';
-    if (/\b(le|la|les|de|du|un|une|est|je|vous|nous)\b/i.test(text)) return 'fr-FR';
-    if (/\b(el|la|los|las|es|en|un|una|que|por)\b/i.test(text))      return 'es-ES';
-    return 'id-ID';
-}
-
-/* ═══════════════════════════════
-   TEXT-TO-SPEECH
-═══════════════════════════════ */
-
-let activeBtn = null;
-
-function speakText(getText, btn) {
-    if (!window.speechSynthesis) return;
-
-    if (speechSynthesis.speaking) {
-        speechSynthesis.cancel();
-        if (activeBtn) { activeBtn.textContent = '🔊 Listen'; activeBtn.classList.remove('speaking'); }
-        if (activeBtn === btn) { activeBtn = null; return; }
-    }
-
-    const text = getText();
-    if (!text || text === 'Thinking...') return;
-
-    const utterance  = new SpeechSynthesisUtterance(text);
-    utterance.lang   = detectLang(text);
-    utterance.rate   = 0.95;
-    utterance.pitch  = 1;
-
-    const onEnd = () => {
-        btn.textContent = '🔊 Listen';
-        btn.classList.remove('speaking');
-        activeBtn = null;
-    };
-
-    utterance.onstart = () => {
-        activeBtn = btn;
-        btn.textContent = '■ Stop';
-        btn.classList.add('speaking');
-    };
-    utterance.onend   = onEnd;
-    utterance.onerror = onEnd;
-
-    speechSynthesis.speak(utterance);
-}
-
-/* ═══════════════════════════════
    MESSAGES
 ═══════════════════════════════ */
 
 const LABELS = { user: 'You', bot: 'Travel AI 🌍' };
+
+marked.setOptions({ breaks: true });
+
+function renderBubble(bubble, role, text) {
+    if (role === 'bot') {
+        bubble.innerHTML = marked.parse(text);
+    } else {
+        bubble.textContent = text;
+    }
+}
 
 function appendMessage(role, text, scroll = true) {
     const wrapper = document.createElement('div');
@@ -102,14 +55,9 @@ function appendMessage(role, text, scroll = true) {
 
     const bubble = document.createElement('div');
     bubble.className = 'msg-bubble';
-    bubble.textContent = text;
+    renderBubble(bubble, role, text);
 
-    const ttsBtn = document.createElement('button');
-    ttsBtn.className = 'tts-btn';
-    ttsBtn.textContent = '🔊 Listen';
-    ttsBtn.addEventListener('click', () => speakText(() => bubble.textContent, ttsBtn));
-
-    wrapper.append(label, bubble, ttsBtn);
+    wrapper.append(label, bubble);
     chatBox.appendChild(wrapper);
     if (scroll) chatBox.scrollTop = chatBox.scrollHeight;
     return { wrapper, bubble };
@@ -172,8 +120,6 @@ function persistCurrent() {
 
 function renderChat(conv) {
     chatBox.innerHTML = '';
-    if (speechSynthesis.speaking) speechSynthesis.cancel();
-    activeBtn = null;
     conv.forEach(({ role, text }) => appendMessage(role === 'user' ? 'user' : 'bot', text, false));
     chatBox.scrollTop = chatBox.scrollHeight;
 }
@@ -255,7 +201,7 @@ form.addEventListener('submit', async function (e) {
 
         const data  = await res.json();
         const reply = data.result || 'Sorry, no response received.';
-        bubble.textContent = reply;
+        renderBubble(bubble, 'bot', reply);
         conversation.push({ role: 'model', text: reply });
         persistCurrent();
     } catch (err) {
